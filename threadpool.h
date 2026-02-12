@@ -18,7 +18,7 @@ public:
     void submit(Fn &&work, Args &&... args)
     {
         std::unique_lock<std::mutex> lock(_job_mtx);
-        _job_queue.push(std::bind(work, args...));
+        _job_queue.push(std::bind(std::forward<Fn>(work), std::forward<Args>(args)...));
         lock.unlock();
         _cv.notify_all();
     }
