@@ -25,26 +25,26 @@ threadpool::~threadpool()
 
 void threadpool::do_work()
 {
-    while (_running)
+    while (true)
     {
         std::unique_lock<std::mutex> lock(_job_mtx);
         _cv.wait_for(lock, _timeout_ms, [this]{ return !_running || !_job_queue.empty(); });
 
-        if (!_running)
-        {
-            break;
-        }
-
         if (_job_queue.empty())
         {
+            if (!_running)
+            {
+                break;
+            }
             continue;
         }
 
+        auto job = std::move(_job_queue.front());
+        _job_queue.pop();
+        lock.unlock();
+
         try
         {
-            auto job = _job_queue.front();
-            _job_queue.pop();
-            lock.unlock();
             job();
         }
         catch(const std::exception& e)

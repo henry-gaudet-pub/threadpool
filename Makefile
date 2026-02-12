@@ -1,4 +1,4 @@
-all: 
-	g++ threadpool.cpp test.cpp -lpthread -o threadpool_test
+all:
+	g++ -std=c++11 threadpool.cpp test.cpp -lpthread -o threadpool_test
 clean:
-	rm threadpool_test
+	rm -f threadpool_test
