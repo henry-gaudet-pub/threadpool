@@ -2,13 +2,25 @@
 #include <iostream>
 #include <vector>
 
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
+
 std::mutex print_mtx;
 
+#if __cplusplus >= 201703L
+void print(std::string_view s)
+{
+    std::scoped_lock lock(print_mtx);
+    std::cout << "[" << std::this_thread::get_id() << "]  " << s << std::endl;
+}
+#else
 void print(std::string&& s)
 {
     std::lock_guard<std::mutex> lock(print_mtx);
     std::cout << "[" << std::this_thread::get_id() << "]  " << s << std::endl;
 }
+#endif
 
 void work_test(size_t job_num)
 {
